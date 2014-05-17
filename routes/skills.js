@@ -42,14 +42,40 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
   sorted_skills.sort( sort_skills );
 
   var purchases_set = get_set_of_available_purchases(sorted_skills, gold, user_level);
+  purchases_set = remove_subset_purchases(purchases_set);
 
-  res.send("Skills with levels: "+JSON.stringify(skills)+"<br><br>Purchases set:<br><pre>"+JSON.stringify(purchases_set.array(), null, 2)+"</pre>");
+  for( var i in purchases_set ){
+    purchases_set[i] = {"cost":cost_of_set(purchases_set[i].array(),user_level,skills), "upgrades":purchases_set[i].array()};
+  }
+
+  purchases_set.sort(function(a, b){
+    return b.cost - a.cost;
+  });
+
+  var outputString = "";
+  for( var i in purchases_set ){
+    var change = gold - purchases_set[i].cost;
+    outputString+= "Option "+i+":  Total Cost: "+purchases_set[i].cost+", Change: "+change+"\n";
+    outputString+= "  Skills: ";
+    for( var j in purchases_set[i].upgrades )
+      outputString += purchases_set[i].upgrades[j].name + "("+purchases_set[i].upgrades[j].current_level+"), ";
+    outputString += "\n";
+  }
+
+
+  res.send("Purchases set:<br><pre>"+outputString+"</pre>");
   //res.render('skills', {"skills" :  skills, 'user_level':user_level, 'gold':gold});
 });
 
-function sort_skills(a, b){
-  return a.levels[a.current_level] - b.levels[b.current_level];
+function cost_of_set(purchases_array, start_level,skills){
+  var total_cost = 0;
+  var p_level = start_level;
+  for(var i in purchases_array){
+    total_cost += cost_this_level({"levels":skills[purchases_array[i].name].levels,"current_level":purchases_array[i].current_level}, p_level++);
+  }
+  return total_cost;
 }
+
 
 function get_set_of_available_purchases(skills_array, gold, level){
 
@@ -58,60 +84,83 @@ function get_set_of_available_purchases(skills_array, gold, level){
     //Return empty set
     return new sets.Set();
   } 
-  console.log("Level: "+level+", Gold: "+gold+", Skill: "+skills_array[0].name+":"+skills_array[0].current_level);
-  if( cost_this_level(skills_array[0],level) > gold ){
-    //Return empty set
-    return new sets.Set();
-  }
-
-  var result_set;
-
-  // Add this 
-
-  var skills_minus_current = clone(skills_array);
-  skills_minus_current.shift();
-  
-
-  //Not Used 
-  //call subs, full money, Add to set
-  result_set = get_set_of_available_purchases(skills_minus_current, gold, level);
-
-  //Used no upgrades
-  //call subs, money - skill cost - 10, level + 1
-  var upgrade_set;
-  upgrade_set = get_set_of_available_purchases(skills_minus_current, gold - 10 - cost_this_level(skills_array[0], level), level + 1);
-
-  //Used with upgrades
-  //Check if upgrade is available, and if it is affordable
-  if( skills_array[0].current_level < skills_array[0].levels.length - 1 
-      && cost_this_level({"levels":skills_array[0].levels,"current_level":skills_array[0].current_level + 1}) < gold - cost_this_level(skills_array[0], level)){
-    var skills_with_upgrade = clone(skills_array);
-    //Create upgraded skill
-    var upgraded_skill = clone(skills_with_upgrade.shift());
-    upgraded_skill.current_level += 1;
-
-    skills_with_upgrade.unshift(upgraded_skill);
-
-    // Must sort list so cheapest is element 0
-    skills_with_upgrade.sort( sort_skills );
-    upgrade_set = upgrade_set.union(get_set_of_available_purchases(skills_with_upgrade, gold - 10 - cost_this_level(skills_array[0], level), level + 1));  
-  }
-  
-  //Add current skill to each result set.
-  var upgrade_set_array;
-  upgrade_set_array = upgrade_set.array();
-  if(upgrade_set_array.length == 0){
-    upgrade_set_array.push(JSON.stringify([truncate_skill(skills_array[0])]));
+  //Check if this skill has no remaining upgrades
+  if(skills_array[0].current_level >= skills_array[0].levels.length - 1){
+    //Call only subs without current skill
+    var skills_minus_current = clone(skills_array);
+    skills_minus_current.shift();
+    return get_set_of_available_purchases(skills_minus_current, gold, level);
   } else {
-    for( var i in upgrade_set_array ){
-      upgrade_set_array[i] = JSON.stringify((new sets.Set(JSON.parse(upgrade_set_array[i])).add(truncate_skill(skills_array[0]))).array());
+    console.log("Level: "+level+", Gold: "+gold+", Skill: "+skills_array[0].name+":"+skills_array[0].current_level);
+    if( cost_this_level(skills_array[0],level) > gold ){
+      //Return empty set
+      return new sets.Set();
     }
+
+    var result_set;
+
+    // Add this 
+
+    var skills_minus_current = clone(skills_array);
+    skills_minus_current.shift();
+    
+    //This skill not used 
+    //call child without this skill, current gold, current level
+    result_set = get_set_of_available_purchases(skills_minus_current, gold, level);
+
+    //This skill used, but no upgrades
+    //call child without this skill but add it to each result, money - skill cost - 10, level + 1
+    var upgrade_set;
+    console.log("Calling upgrade set with gold:"+gold+"; newgold: "+ (gold - 10 - cost_this_level(skills_array[0], level)));
+    upgrade_set = get_set_of_available_purchases(skills_minus_current, gold - 10 - cost_this_level(skills_array[0], level), level + 1);
+
+    //This skill used, adding upgrade back in
+    //Check if upgrade is available, and if it is affordable
+  /*  if( skills_array[0].current_level < skills_array[0].levels.length - 1 
+        && cost_this_level({"levels":skills_array[0].levels,"current_level":skills_array[0].current_level + 1}) < gold - cost_this_level(skills_array[0], level)){
+      var skills_with_upgrade = clone(skills_array);
+      //Create upgraded skill
+      var upgraded_skill = clone(skills_with_upgrade.shift());
+      upgraded_skill.current_level += 1;
+
+      skills_with_upgrade.unshift(upgraded_skill);
+
+      // Must sort list so cheapest is element 0
+      skills_with_upgrade.sort( sort_skills );
+      upgrade_set = upgrade_set.union(get_set_of_available_purchases(skills_with_upgrade, gold - 10 - cost_this_level(skills_array[0], level), level + 1));  
+    }
+  */
+    
+    //Add current skill to each result from child set.
+    var upgrade_set_array;
+    upgrade_set_array = upgrade_set.array();
+    if(upgrade_set_array.length == 0){
+      upgrade_set_array.push(JSON.stringify([truncate_skill(skills_array[0])]));
+    } else {
+      var allEmptySets = true;
+      for( var i in upgrade_set_array ){
+        // Don't add this skill to empty sets
+        var skill_array = JSON.parse(upgrade_set_array[i]);
+        if(skill_array.length > 0 ){
+          allEmptySets = false;
+          skill_array.unshift(truncate_skill(skills_array[0]));
+          upgrade_set_array[i] = JSON.stringify(skill_array);
+        } 
+      }
+      //If the child set was only empty sets, need to add just this skill to result set
+      if(allEmptySets)
+        upgrade_set_array.push(JSON.stringify([truncate_skill(skills_array[0])]));
+    }
+
+    // return result set
+
+  //  console.log("Level: "+level+", Gold: "+gold+", Skill: "+skills_array[0].name+":"+skills_array[0].current_level+" || Returning: "+JSON.stringify(result_set.union(new sets.Set(upgrade_set_array)).array(), null, 2));
+    return result_set.union(new sets.Set(upgrade_set_array));
   }
+}
 
-  // return result set
-
-//  console.log("Level: "+level+", Gold: "+gold+", Skill: "+skills_array[0].name+":"+skills_array[0].current_level+" || Returning: "+JSON.stringify(result_set.union(new sets.Set(upgrade_set_array)).array(), null, 2));
-  return result_set.union(new sets.Set(upgrade_set_array));
+function sort_skills(a, b){
+  return a.levels[a.current_level] - b.levels[b.current_level];
 }
 
 function truncate_skill(skill){
@@ -122,12 +171,59 @@ function add_level(skill){
 }
 
 function cost_this_level(skill, level){
-  return skill.levels[skill.current_level] + level * 10;
+  console.log("calling: "+JSON.stringify(skill));
+  if(parseInt(skill.levels[skill.current_level]) > 0) {
+    console.log("No prob result...");
+    return parseInt(skill.levels[skill.current_level]) + parseInt(level) * 10;
+  } else {
+    console.log("Bad result...");
+    return 999999999999;
+  }
+}
+
+function remove_subset_purchases(purchases){
+  var p_array = purchases.array();
+  var result_set = [];
+  for(var i in p_array)
+    p_array[i] = new sets.Set(JSON.parse(p_array[i]));
+  for(var i in p_array){
+    if(i == p_array.length - 1){
+      result_set.push(p_array[i]);
+    }else{
+      var is_subset = false;
+      for(var j = parseInt(i) + 1; j < p_array.length; j++){
+        if(isSubset(p_array[i].array(),p_array[j].array())){
+          is_subset = true;
+          break;
+        }
+      }
+      if(!is_subset){
+        result_set.push(p_array[i]);
+      }
+    }
+  }
+  return result_set;
+}
+
+function isSubset(a, b){
+  for(var i in a){
+    var itemSubset = false;
+    for(var j in b){
+      if(a[i].name === b[j].name && a[i].current_level === b[j].current_level ){
+        itemSubset = true;
+        break;
+      }
+    }
+    if(!itemSubset)
+      return false;
+  }
+  return true;
 }
 
 function clone(obj){
   return JSON.parse(JSON.stringify(obj));
 }
+
 
 router.get("/", function(req, res) {
   res.redirect('/skills/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100');
