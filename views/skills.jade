@@ -5,13 +5,26 @@ extends layout
 block content
   h1= "Skills List"
   p User level: #{user_level}
-  - each val,key in skills
-    
-    h2 #{key} (#{skills[key].current_level} of #{skills[key]['levels'].length})
-
-    - var ctl = skills[key]['levels'][skills[key].current_level]
-    - ctl = ctl || skills[key]['levels'][skills[key]['levels'].length-1]
-    - ctl = parseInt(ctl) + user_level * 10
-    p Cost this level: #{skills[key].cost_this_level}
-    a(href='#{skills[key].minus_url}') Minus
-    a(href='#{skills[key]["plus_url"]}') Plus
+  // - each val,key in skills
+  table
+    thead
+      td Current Skills: #{skills.length} 
+    tbody
+      - var i = 0
+      each skill, skill_name in skills
+        - if (i % 6 == 0) {
+        tr
+        - }
+        - i++
+          td.skill
+            h3 #{skill_name}
+            h4 (#{skill.current_level} of #{skill['levels'].length})
+            table.plusminus
+              thead
+              tbody
+                tr
+                  td
+                    a(href='#{skill.minus_url}') Minus
+                  td
+                    a(href='#{skill["plus_url"]}') Plus
+  pre #{upgrades}

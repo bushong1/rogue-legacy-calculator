@@ -23,9 +23,9 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
     
 
     url[i] = Math.min(parseInt(current_level)+1,skills[skill_name]['levels'].length);
-    skills[skill_name]['plus_url']  = "/skills/"+url.join(',');
+    skills[skill_name]['plus_url']  = "/skills/"+url.join(',')+","+gold;
     url[i] = Math.max(parseInt(current_level)-1,0);
-    skills[skill_name]['minus_url'] = "/skills/"+url.join(',');
+    skills[skill_name]['minus_url'] = "/skills/"+url.join(',')+","+gold;
     i++;
   }
 
@@ -55,16 +55,16 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
   var outputString = "";
   for( var i in purchases_set ){
     var change = gold - purchases_set[i].cost;
-    outputString+= "Option "+i+":  Total Cost: "+purchases_set[i].cost+", Change: "+change+"\n";
-    outputString+= "  Skills: ";
+    outputString+= "Option "+i+":  Total Cost: "+purchases_set[i].cost+", Change: "+change+"<br/>\n";
+    outputString+= "  Skills: <br/>";
     for( var j in purchases_set[i].upgrades )
       outputString += purchases_set[i].upgrades[j].name + "("+purchases_set[i].upgrades[j].current_level+"), ";
-    outputString += "\n";
+    outputString += "<br/>\n";
   }
 
-
-  res.send("Purchases set:<br><pre>"+outputString+"</pre>");
-  //res.render('skills', {"skills" :  skills, 'user_level':user_level, 'gold':gold});
+  console.log(JSON.stringify({"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString}));
+  //res.send("Purchases set:<br><pre>"+outputString+"</pre>");
+  res.render('skills', {"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString});
 });
 
 function cost_of_set(purchases_array, start_level,skills){
