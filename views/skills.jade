@@ -5,26 +5,21 @@ extends layout
 block content
   h1= "Skills List"
   p User level: #{user_level}
-  // - each val,key in skills
-  table
-    thead
-      td Current Skills: #{skills.length} 
-    tbody
       - var i = 0
-      each skill, skill_name in skills
-        - if (i % 6 == 0) {
-        tr
-        - }
-        - i++
-          td.skill
-            h3 #{skill_name}
-            h4 (#{skill.current_level} of #{skill['levels'].length})
-            table.plusminus
-              thead
-              tbody
-                tr
-                  td
-                    a(href='#{skill.minus_url}') Minus
-                  td
-                    a(href='#{skill["plus_url"]}') Plus
+  each skill, skill_name in skills
+    p Current Skills: #{skills.length} 
+    div.skill(id="#{skill_name.replace(/\s+/g, '')}")
+      p.skill-name #{skill_name}
+      p.levels (#{skill.current_level} of #{skill['levels'].length})
+      table.plusminus
+        thead
+        tbody
+          tr
+            td.disable
+              a(href='#{skill.disable_url}')
+                img(src='/images/red_x.png')
+            td.minus
+              a(href='#{skill.minus_url}') -
+            td.plus
+              a(href='#{skill.plus_url}') +
   pre #{upgrades}

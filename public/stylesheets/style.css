@@ -1,8 +1,45 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%), url(bg.png) , url(/images/skilltree.png);
+  background: -moz-linear-gradient(top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.9)), color-stop(100%,rgba(255,255,255,0.9))), url(/images/skilltree.png);
+  background: -webkit-linear-gradient(top, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
+  background: -o-linear-gradient(top, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
+  background: -ms-linear-gradient(top, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
+  background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
+  background-repeat:no-repeat;
 }
 
 a {
   color: #00B7FF;
+}
+
+.skill { 
+  line-height: .2;
+}
+
+#Smithy {
+  position: absolute; 
+  top: 895px; 
+  left: 654px;
+}
+
+.minus {
+  padding-left: 0;
+}
+.plus {
+  padding-right: 0;
+}
+.disable {
+  
+}
+
+.levels {
+
+}
+
+.skill-name {
+  font-size: 15px;
+  font-weight: bold;
 }
