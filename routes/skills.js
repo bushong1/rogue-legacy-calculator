@@ -5,27 +5,47 @@ var sets = require('simplesets');
 
 /* GET home page. */
 
-router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d)+,(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)$/, function(req, res) {
+router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d)+,(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\w\w\w\w\w\w\w\w),(\d+)$/, function(req, res) {
   var param_array = [];
   for(var i = 0; i < 32; i++){
     param_array[i] = req.params[i];
   }
-  var gold = req.params[32];
+  var gold = req.params[33];
+  var enabled_list = parseInt(req.params[32],16).toString(2);
+  console.log("Enabled list: "+enabled_list);
   var i = 0;
   console.log(req.route);
   user_level = 0;
+  var current_url = "/skills/"+param_array.slice(0).join(',')+","+req.params[32]+","+gold;
   for ( var skill_name in skills ){
-    var url = param_array.slice(0);
+    var url = clone(param_array);
     var current_level = parseInt(req.params[i]);
     user_level += current_level;
 
     skills[skill_name]['current_level'] = current_level;
-    
+    skills[skill_name]['enabled'] = parseInt(enabled_list[i]) == 1;
 
+    // Toggle disabled url by subtracting it from 1
+    enabled_list = enabled_list.replaceAt(i, (1 - parseInt(enabled_list[i])).toString());
+    var temp_enabled = parseInt(enabled_list, 2).toString(16).paddingLeft('00000000');
+    skills[skill_name]['disable_url'] = "/skills/"+url.join(',')+","+temp_enabled+","+gold;
+    enabled_list = enabled_list.replaceAt(i, (1 - parseInt(enabled_list[i])).toString());
+
+    // Set the url's for plus and minus links
+    var plus_url, minus_url;
     url[i] = Math.min(parseInt(current_level)+1,skills[skill_name]['levels'].length);
-    skills[skill_name]['plus_url']  = "/skills/"+url.join(',')+","+gold;
+    plus_url  = "/skills/"+url.join(',')+","+req.params[32]+","+gold;
     url[i] = Math.max(parseInt(current_level)-1,0);
-    skills[skill_name]['minus_url'] = "/skills/"+url.join(',')+","+gold;
+    minus_url = "/skills/"+url.join(',')+","+req.params[32]+","+gold;
+
+    if(plus_url === current_url)
+      skills[skill_name]['plus_url'] = "#";
+    else
+      skills[skill_name]['plus_url']  = plus_url;
+    if(minus_url === current_url)
+      skills[skill_name]['minus_url'] = "#";
+    else
+      skills[skill_name]['minus_url'] = minus_url;
     i++;
   }
 
@@ -62,7 +82,7 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
     outputString += "<br/>\n";
   }
 
-  console.log(JSON.stringify({"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString}));
+  //console.log(JSON.stringify({"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString}));
   //res.send("Purchases set:<br><pre>"+outputString+"</pre>");
   res.render('skills', {"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString});
 });
@@ -91,7 +111,7 @@ function get_set_of_available_purchases(skills_array, gold, level){
     skills_minus_current.shift();
     return get_set_of_available_purchases(skills_minus_current, gold, level);
   } else {
-    console.log("Level: "+level+", Gold: "+gold+", Skill: "+skills_array[0].name+":"+skills_array[0].current_level);
+    //console.log("Level: "+level+", Gold: "+gold+", Skill: "+skills_array[0].name+":"+skills_array[0].current_level);
     if( cost_this_level(skills_array[0],level) > gold ){
       //Return empty set
       return new sets.Set();
@@ -224,9 +244,16 @@ function clone(obj){
   return JSON.parse(JSON.stringify(obj));
 }
 
+String.prototype.replaceAt=function(index, character) {
+  return this.substr(0, index) + character + this.substr(index+character.length);
+}
+
+String.prototype.paddingLeft = function (paddingValue) {
+  return String(paddingValue + this).slice(-paddingValue.length);
+};
 
 router.get("/", function(req, res) {
-  res.redirect('/skills/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100');
+  res.redirect('/skills/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,ffffffff,100');
 });
 
 module.exports = router;

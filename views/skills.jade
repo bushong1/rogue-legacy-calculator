@@ -4,10 +4,8 @@ extends layout
 
 block content
   h1= "Skills List"
-  p User level: #{user_level}
-      - var i = 0
+  h2.user-level User level: #{user_level}
   each skill, skill_name in skills
-    p Current Skills: #{skills.length} 
     div.skill(id="#{skill_name.replace(/\s+/g, '')}")
       p.skill-name #{skill_name}
       p.levels (#{skill.current_level} of #{skill['levels'].length})
@@ -17,9 +15,15 @@ block content
           tr
             td.disable
               a(href='#{skill.disable_url}')
-                img(src='/images/red_x.png')
+                - if(skill.enabled) {
+                  img(src='/images/red_x_small.jpg')
+                - } else {
+                  img(src='/images/green_check_small.jpg')
+                - }
             td.minus
-              a(href='#{skill.minus_url}') -
+              a(href='#{skill.minus_url}')
+                img(src='/images/red_minus_small.jpg')
             td.plus
-              a(href='#{skill.plus_url}') +
+              a(href='#{skill.plus_url}')
+                img(src='/images/green_plus_small.jpg')
   pre #{upgrades}

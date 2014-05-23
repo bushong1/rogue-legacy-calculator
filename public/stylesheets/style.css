@@ -1,13 +1,15 @@
 body {
   padding: 50px;
+  width: 1270px;
+  height: 1070px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%), url(bg.png) , url(/images/skilltree.png);
-  background: -moz-linear-gradient(top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.9)), color-stop(100%,rgba(255,255,255,0.9))), url(/images/skilltree.png);
-  background: -webkit-linear-gradient(top, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
-  background: -o-linear-gradient(top, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
-  background: -ms-linear-gradient(top, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
-  background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url(/images/skilltree.png);
+  background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.8) 100%), url(bg.png) , url(/images/skilltree.png);
+  background: -moz-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 100%), url(/images/skilltree.png);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.8)), color-stop(100%,rgba(255,255,255,0.8))), url(/images/skilltree.png);
+  background: -webkit-linear-gradient(top, rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.8) 100%), url(/images/skilltree.png);
+  background: -o-linear-gradient(top, rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.8) 100%), url(/images/skilltree.png);
+  background: -ms-linear-gradient(top, rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.8) 100%), url(/images/skilltree.png);
+  background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.8) 100%), url(/images/skilltree.png);
   background-repeat:no-repeat;
 }
 
@@ -16,13 +18,8 @@ a {
 }
 
 .skill { 
-  line-height: .2;
-}
-
-#Smithy {
-  position: absolute; 
-  top: 895px; 
-  left: 654px;
+  line-height: .1;
+  width: 85px;
 }
 
 .minus {
@@ -35,11 +32,182 @@ a {
   
 }
 
-.levels {
+#user-level {
 
 }
 
+#user-level-number {
+
+}
+
+.levels {
+  font-weight: bold;
+}
+
 .skill-name {
+  line-height: .8;
   font-size: 15px;
   font-weight: bold;
+}
+
+#Smithy {
+  position: absolute; 
+  left: 639px;
+  top: 890px; 
+}
+
+#HealthUp {
+  position: absolute;
+  left: 638px;
+  top: 754px;
+}
+#ManaUp {
+  position: absolute;
+  left: 638px;
+  top: 1008px;
+}
+#UpgradeKnight {
+  position: absolute;
+  left: 638px;
+  top: 648px;
+}
+#EquipUp {
+  position: absolute;
+  left: 638px;
+  top: 516px;
+}
+#Architect {
+  position: absolute;
+  left: 328px;
+  top: 714px;
+}
+#Enchantress {
+  position: absolute;
+  left: 950px;
+  top: 714px;
+}
+#AttackUp {
+  position: absolute;
+  left: 328px;
+  top: 842px;
+}
+#UpgradeBarbarian {
+  position: absolute;
+  left: 328px;
+  top: 576px;
+}
+#UpgradeMage {
+  position: absolute;
+  left: 950px;
+  top: 576px;
+}
+#MagicDamageUp {
+  position: absolute;
+  left: 948px;
+  top: 842px;
+}
+#UnlockMiner {
+  position: absolute;
+  left: 1119px;
+  top: 714px;
+}
+#UnlockShinobi {
+  position: absolute;
+  left: 206px;
+  top: 842px;
+}
+#UpgradeMiner {
+  position: absolute;
+  left: 1229px;
+  top: 644px;
+}
+#UpgradeKnave {
+  position: absolute;
+  left: 950px;
+  top: 468px;
+}
+#Haggle {
+    position: absolute;
+    left: 206px;
+    top: 578px;
+}
+#CritChanceUp {
+  position: absolute;
+  left: 212px;
+  top: 1012px;
+}
+#GoldGainUp {
+  position: absolute;
+  left: 1120px;
+  top: 1012px;
+}
+#PotionUp {
+  position: absolute;
+  left: 948px;
+  top: 362px;
+}
+#CritDamageUp {
+  position: absolute;
+  left: 336px;
+  top: 1012px;
+}
+#UnlockLich {
+  position: absolute;
+  left: 106px;
+  top: 726px;
+}
+#UpgradeShinobi {
+  position: absolute;
+  left: 208px;
+  top: 430px;
+}
+#UnlockSpellThief {
+  position: absolute;
+  left: 844px;
+  top: 362px;
+}
+#UpgradeSpellThief {
+  position: absolute;
+  left: 844px;
+  top: 260px;
+}
+#ManaCostDown {
+  position: absolute;
+  left: 946px;
+  top: 216px;
+}
+#InvulnTimeUp {
+  position: absolute;
+  left: 844px;
+  top: 156px;
+}
+#ArmorUp {
+  position: absolute;
+  left: 452px;
+  top: 430px;
+}
+#UpgradeLich {
+  position: absolute;
+  left: 104px;
+  top: 578px;
+}
+#DownStrikeUp {
+  position: absolute;
+  left: 452px;
+  top: 292px;
+}
+#RandomizeChildren {
+  position: absolute;
+  left: 1120px;
+  top: 262px;
+}
+#DeathDefy {
+  position: absolute;
+  left: 5px;
+  top: 646px;
+}
+#Beastiality {
+  position: absolute;
+  left: 847px;
+  top: 0px;
 }
