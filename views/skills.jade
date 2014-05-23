@@ -3,7 +3,7 @@ extends layout
 - var user_level = 0
 
 block content
-  h1= "Skills List"
+  h1= "Rogue Legacy Skill Purchase Calculator With A Long Name"
   h2.user-level User level: #{user_level}
   table
     tr
@@ -21,9 +21,9 @@ block content
             td.disable
               a(href='#{skill.disable_url}')
                 - if(skill.enabled) {
-                  img(src='/images/red_x_small.jpg')
-                - } else {
                   img(src='/images/green_check_small.jpg')
+                - } else {
+                  img(src='/images/red_x_small.jpg')
                 - }
             td.minus
               a(href='#{skill.minus_url}')
