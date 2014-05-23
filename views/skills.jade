@@ -5,6 +5,11 @@ extends layout
 block content
   h1= "Skills List"
   h2.user-level User level: #{user_level}
+  table
+    tr
+      h2 Gold: #{gold}
+      input(id="gold", onkeyup='document.getElementById("go").href = "#{base_url}" + document.getElementById("gold").value')
+  a(id="go" href='#{base_url+gold}') What can I buy with this?
   each skill, skill_name in skills
     div.skill(id="#{skill_name.replace(/\s+/g, '')}")
       p.skill-name #{skill_name}

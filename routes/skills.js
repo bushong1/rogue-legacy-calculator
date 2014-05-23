@@ -11,12 +11,13 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
     param_array[i] = req.params[i];
   }
   var gold = req.params[33];
-  var enabled_list = parseInt(req.params[32],16).toString(2);
+  var enabled_list = hexStringToBinaryString(req.params[32]);
   console.log("Enabled list: "+enabled_list);
-  var i = 0;
   console.log(req.route);
   user_level = 0;
-  var current_url = "/skills/"+param_array.slice(0).join(',')+","+req.params[32]+","+gold;
+  var i = 0;
+  var base_url = "/skills/"+param_array.slice(0).join(',')+","+req.params[32]+",";
+  var current_url = current_url+gold;
   for ( var skill_name in skills ){
     var url = clone(param_array);
     var current_level = parseInt(req.params[i]);
@@ -24,19 +25,14 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
 
     skills[skill_name]['current_level'] = current_level;
     skills[skill_name]['enabled'] = parseInt(enabled_list[i]) == 1;
-
-    // Toggle disabled url by subtracting it from 1
-    enabled_list = enabled_list.replaceAt(i, (1 - parseInt(enabled_list[i])).toString());
-    var temp_enabled = parseInt(enabled_list, 2).toString(16).paddingLeft('00000000');
-    skills[skill_name]['disable_url'] = "/skills/"+url.join(',')+","+temp_enabled+","+gold;
-    enabled_list = enabled_list.replaceAt(i, (1 - parseInt(enabled_list[i])).toString());
+    skills[skill_name]['disable_url'] = "/skills/"+url.join(',')+","+toggleDisableHexAtIndex(req.params[32],i)+",0";
 
     // Set the url's for plus and minus links
     var plus_url, minus_url;
     url[i] = Math.min(parseInt(current_level)+1,skills[skill_name]['levels'].length);
-    plus_url  = "/skills/"+url.join(',')+","+req.params[32]+","+gold;
+    plus_url  = "/skills/"+url.join(',')+","+req.params[32]+",0";
     url[i] = Math.max(parseInt(current_level)-1,0);
-    minus_url = "/skills/"+url.join(',')+","+req.params[32]+","+gold;
+    minus_url = "/skills/"+url.join(',')+","+req.params[32]+",0";
 
     if(plus_url === current_url)
       skills[skill_name]['plus_url'] = "#";
@@ -84,7 +80,7 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
 
   //console.log(JSON.stringify({"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString}));
   //res.send("Purchases set:<br><pre>"+outputString+"</pre>");
-  res.render('skills', {"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString});
+  res.render('skills', {"skills" :  skills, 'user_level':user_level, 'gold':gold, 'upgrades':outputString, 'base_url':base_url});
 });
 
 function cost_of_set(purchases_array, start_level,skills){
@@ -242,6 +238,20 @@ function isSubset(a, b){
 
 function clone(obj){
   return JSON.parse(JSON.stringify(obj));
+}
+
+function binaryStringToHexString(binStr){
+  return parseInt(binStr, 2).toString(16).paddingLeft('00000000');
+}
+
+function hexStringToBinaryString(hexStr){
+  return parseInt(hexStr, 16).toString(2).paddingLeft('00000000000000000000000000000000');
+}
+
+function toggleDisableHexAtIndex(disableHex, idx){
+  var disableBin = hexStringToBinaryString(disableHex);
+  disableBin = disableBin.replaceAt(idx, (1 - parseInt(disableBin[idx])).toString());
+  return binaryStringToHexString(disableBin);
 }
 
 String.prototype.replaceAt=function(index, character) {
