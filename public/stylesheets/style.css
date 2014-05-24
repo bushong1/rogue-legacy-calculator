@@ -32,6 +32,16 @@ a {
   
 }
 
+#upgrades, #u {
+  position: absolute;
+  top: 1111px;
+}
+#upgrades {
+  overflow: auto;
+  width: 1250px;
+  height: 300px;
+}
+
 #user-level {
 
 }

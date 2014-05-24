@@ -8,8 +8,8 @@ block content
   table
     tr
       h2 Gold: #{gold}
-      input(id="gold", onkeyup='document.getElementById("go").href = "#{base_url}" + document.getElementById("gold").value')
-  a(id="go" href='#{base_url+gold}') What can I buy with this?
+      input(id="gold", onkeyup='if (event.keyCode == 13) document.getElementById("go").click(); else document.getElementById("go").href = "#{base_url}" + document.getElementById("gold").value')
+  a(id="go" href='#{base_url+gold}#u') What can I buy with this?
   each skill, skill_name in skills
     div.skill(id="#{skill_name.replace(/\s+/g, '')}")
       p.skill-name #{skill_name}
@@ -31,4 +31,5 @@ block content
             td.plus
               a(href='#{skill.plus_url}')
                 img(src='/images/green_plus_small.jpg')
-  pre #{upgrades}
+  a#u(name="u")
+  pre#upgrades #{upgrades}

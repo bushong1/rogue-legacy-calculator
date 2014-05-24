@@ -5,21 +5,25 @@ var sets = require('simplesets');
 
 /* GET home page. */
 
+var timeoutTime;
 router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d)+,(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\w\w\w\w\w\w\w\w),(\d+)$/, function(req, res) {
+  timeoutTime = new Date();
+  timeoutTime = timeoutTime.setSeconds(timeoutTime.getSeconds() + 5);
   var param_array = [];
+  var user_level = 0;
   for(var i = 0; i < 32; i++){
     param_array[i] = req.params[i];
+    user_level += parseInt(req.params[i]);
   }
   var gold = req.params[33];
   var enabled_list = hexStringToBinaryString(req.params[32]);
-  user_level = 0;
   var i = 0;
   var base_url = "/skills/"+param_array.slice(0).join(',')+","+req.params[32]+",";
   var current_url = current_url+gold;
+
   for ( var skill_name in skills ){
     var url = clone(param_array);
     var current_level = parseInt(req.params[i]);
-    user_level += current_level;
 
     skills[skill_name]['current_level'] = current_level;
     skills[skill_name]['enabled'] = parseInt(enabled_list[i]) == 1;
@@ -27,8 +31,13 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
 
     // Set the url's for plus and minus links
     var plus_url, minus_url;
+    var ctl = cost_this_level(skills[skill_name], user_level);
     url[i] = Math.min(parseInt(current_level)+1,skills[skill_name]['levels'].length);
-    plus_url  = "/skills/"+url.join(',')+","+req.params[32]+",0";
+    plus_url  = "/skills/"+url.join(',')+","+req.params[32]+",";
+    if(ctl < gold)
+      plus_url += gold - ctl;
+    else
+      plus_url += "0";
     url[i] = Math.max(parseInt(current_level)-1,0);
     minus_url = "/skills/"+url.join(',')+","+req.params[32]+",0";
 
@@ -36,6 +45,7 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
       skills[skill_name]['plus_url'] = "#";
     else
       skills[skill_name]['plus_url']  = plus_url;
+
     if(minus_url === current_url)
       skills[skill_name]['minus_url'] = "#";
     else
@@ -61,6 +71,7 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
     sorted_skills.sort( sort_skills );
 
     var purchases_set = get_set_of_available_purchases(sorted_skills, gold, user_level);
+    // Remove duplicates
     purchases_set = remove_subset_purchases(purchases_set);
 
     for( var i in purchases_set ){
@@ -70,6 +81,10 @@ router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)
     purchases_set.sort(function(a, b){
       return b.cost - a.cost;
     });
+
+    if( new Date() > timeoutTime ){
+      outputString += "Woah there, Killer. That request took a long time. Result set incomplete.\nBuy a few things, disable some skills, get less money, and try again.\n";
+    }
 
     for( var i in purchases_set ){
       var change = gold - purchases_set[i].cost;
@@ -96,8 +111,8 @@ function cost_of_set(purchases_array, start_level,skills){
 
 function get_set_of_available_purchases(skills_array, gold, level){
 
-  //Empty List || Cheapest Too expensive
-  if(skills_array == null || skills_array.length == 0){
+  //Past timeout || Empty List || Cheapest Too expensive
+  if(skills_array == null || skills_array.length == 0 || new Date() > timeoutTime){
     //Return empty set
     return new sets.Set();
   } 
