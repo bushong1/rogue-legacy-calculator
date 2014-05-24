@@ -8,7 +8,7 @@ var sets = require('simplesets');
 var timeoutTime;
 router.get(/^\/(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d)+,(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(\w\w\w\w\w\w\w\w),(\d+)$/, function(req, res) {
   timeoutTime = new Date();
-  timeoutTime = timeoutTime.setSeconds(timeoutTime.getSeconds() + 5);
+  timeoutTime = timeoutTime.setSeconds(timeoutTime.getSeconds() + 10);
   var param_array = [];
   var user_level = 0;
   for(var i = 0; i < 32; i++){
