@@ -17,7 +17,7 @@
     "underscore": "~1.6.0",
     "simplesets": "~1.2.0",
     "serve-favicon": "~2.4.5",
-    "snyk": "^1.136.2"
+    "snyk": "^1.231.0"
   },
   "snyk": true
 }
